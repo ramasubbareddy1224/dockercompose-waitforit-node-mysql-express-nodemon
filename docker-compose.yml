@@ -1,0 +1,24 @@
+version: '3'
+services:
+    testnodeexpress-service:
+      build: .
+      volumes:
+        - .:/usr/app 
+        - /usr/app/node_modules       
+      environment:
+        NODE_ENV: development  
+      ports:
+        - 9030:9030
+      command: sh -c "/usr/app/wait-for-it.sh --timeout=0 testmysql:3306 && npm run start"
+      depends_on: 
+        - testmysql-service
+      links: 
+        - "testmysql-service:testmysql"  
+    testmysql-service:
+      image: mysql:5.7
+      environment: 
+        MYSQL_ROOT_PASSWORD: mysql123  
+      ports: 
+        - 3306:3306  
+      volumes: 
+        - ./scripts:/docker-entrypoint-initdb.d   
